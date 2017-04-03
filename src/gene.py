@@ -1,6 +1,7 @@
 from enum import Enum
 import sys
 import random
+import math
 
 
 class GeneType(Enum):
@@ -27,12 +28,34 @@ class Gene():
 
     def random_init(self):
         if self.gene_type == GeneType.NONE:
-            sys.exit(-1)
+            raise NotImplementedError
+
         elif self.gene_type == GeneType.BOOL:
             self.value = random.randint(0, 1) == 1
+
         elif self.gene_type == GeneType.INT:
             self.value = random.randint(self.lb, self.ub)
+
         elif self.gene_type == GeneType.REAL:
             self.value = random.uniform(self.lb, self.ub)
+
         elif self.gene_type == GeneType.PERMUT:
-            pass
+            raise NotImplementedError
+
+    def mutate(self):
+        if self.gene_type == GeneType.NONE:
+            raise NotImplementedError
+
+        elif self.gene_type == GeneType.BOOL:
+            self.value = not self.value
+
+        elif self.gene_type == GeneType.INT:
+            dist = int(math.ceil((self.ub - self.lb) * 0.2))
+            self.value += random.randint(-dist, dist)
+
+        elif self.gene_type == GeneType.REAL:
+            dist = math.ceil((self.ub - self.lb) * 0.05)
+            self.value += random.uniform(self.value, dist)
+
+        elif self.gene_type == GeneType.PERMUT:
+            raise NotImplementedError
