@@ -1,3 +1,4 @@
+import copy
 import individual
 import gene
 import random
@@ -12,9 +13,11 @@ class Population():
     ub = None
     elitism = 0
     elite = None
+    diversity = None
+    elapsed_generations = None
 
-    mutation_chance = 0.05
-    crossover_chance = 0.8
+    mutation_chance = None
+    crossover_chance = None
 
     def __init__(self, _size, _ngens, _lb, _ub):
         self.size = _size
@@ -24,6 +27,7 @@ class Population():
         self.population = []
 
     def init(self):
+        self.elapsed_generations = 0
         for _ in range(0, self.size):
             x = None
             x = individual.Individual(self.gtype, self.ngen_size, self.lb, self.ub)
@@ -52,32 +56,36 @@ class Population():
 
     def print(self):
         for pop in self.population:
-            #print(pop)
-            for g in pop.genetic_code:
-                print(g.value, end=' ')
-
-            print(" = " + str(pop.fitness))
+            pop.print()
         print()
 
     def evo_loop(self, niters):
         for _ in range(0, niters):
-            #self.print_best()
-            self.kelitism_load()
-            self.selection()
+            self.elapsed_generations += 1
+            self.evaluate()
 
+            #self.print_best()
+            self.print_status()
+
+            self.kelitism_load()
+
+            self.selection()
             self.crossover()
             self.mutation()
 
-            self.kelitism_load()
+            self.kelitism_store()
 
-            self.evaluate()
+    def print_status(self):
+        print("Gen: %8d best: %4d" % (self.elapsed_generations, self.get_best_fit()))
 
     def selection(self):
         x = []
         for i in range(0, self.size):
             x.append(self.tourney(2))
+        self.population = x
 
     def tourney(self, k):
+        pass
         index = random.randint(0, self.size - 1)
         fitness = self.population[index].fitness
 
@@ -89,7 +97,7 @@ class Population():
                 fitness = fitness2
                 index = index2
 
-        return self.population[index]
+        return copy.deepcopy(self.population[index])
 
     def roulette(self, k):
         pass
@@ -98,17 +106,20 @@ class Population():
         for ind in self.population:
             ind.set_fitness()
 
+    def get_best_fit(self):
+        return sorted(self.population, reverse=True)[:1][0].fitness
+
     def print_best(self):
-        best = sorted(self.population, reverse=True)[:1][0].print()
+        sorted(self.population, reverse=True)[:1][0].print_fitness()
 
     def kelitism_load(self):
         if self.elitism > 0:
-            self.elite = sorted(self.population, reverse=False)[:self.elitism]
+            self.elite = copy.deepcopy(sorted(self.population, reverse=True)[:self.elitism])
 
-    def kelitism_save(self):
+    def kelitism_store(self):
         if self.elitism > 0:
-            for k, v in enumeate(self.elitism):
-                self.population[k] = v
+            for i in range(0, len(self.elite)):
+                self.population[i] = self.elite[i]
 
     def mutation(self):
         for ind in self.population:
@@ -131,8 +142,10 @@ class Population():
     def crossover_uniform(self, p1, p2):
         for i in range(0, len(self.population[p1].genetic_code)):
             if random.random() < 0.5:
+
                 a = self.population[p1].genetic_code[i]
                 self.population[p1].genetic_code[i] = self.population[p2].genetic_code[i]
                 self.population[p2].genetic_code[i] = a
+
                 self.population[p1].set_fitness()
                 self.population[p2].set_fitness()

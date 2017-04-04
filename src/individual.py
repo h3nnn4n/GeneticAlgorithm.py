@@ -32,9 +32,18 @@ class Individual():
         self.invalid_fitness = True
         self.genetic_code.append(newg)
 
+    def print_fitness(self):
+        print(self.fitness)
+
     def print(self):
-        for i in self.genetic_code:
-            print(i.value)
+        if self.gtype == gene.GeneType.INT:
+            for i in self.genetic_code:
+                print("%4d" % i.value, end=' ')
+            print('= ' + str (self.fitness))
+        else:
+            for i in self.genetic_code:
+                print(i.value, end=' ')
+            print('= ' + str (self.fitness))
 
     def mutate(self):
         for g in self.genetic_code:
