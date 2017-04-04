@@ -50,12 +50,18 @@ class Gene():
             self.value = not self.value
 
         elif self.gene_type == GeneType.INT:
+            old = self.value
             dist = int(math.ceil((self.ub - self.lb) * 0.2))
             self.value += random.randint(-dist, dist)
+            if self.value > self.ub or self.value < self.lb:
+                self.value = old
 
         elif self.gene_type == GeneType.REAL:
+            old = self.value
             dist = math.ceil((self.ub - self.lb) * 0.05)
             self.value += random.uniform(self.value, dist)
+            if self.value > self.ub or self.value < self.lb:
+                self.value = old
 
         elif self.gene_type == GeneType.PERMUT:
             raise NotImplementedError

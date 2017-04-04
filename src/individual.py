@@ -58,5 +58,5 @@ class Individual():
     def __cmp__(self, other):
         return cmp(self.fitness, other.fitness)
 
-    def __lt(self, other):
+    def __lt__(self, other):
         return self.fitness < other.fitness

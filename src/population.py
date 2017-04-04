@@ -61,7 +61,7 @@ class Population():
 
     def evo_loop(self, niters):
         for _ in range(0, niters):
-            self.print_best()
+            #self.print_best()
             self.kelitism_load()
             self.selection()
 
@@ -73,10 +73,23 @@ class Population():
             self.evaluate()
 
     def selection(self):
-        self.tourney(2)
+        x = []
+        for i in range(0, self.size):
+            x.append(self.tourney(2))
 
     def tourney(self, k):
-        pass
+        index = random.randint(0, self.size - 1)
+        fitness = self.population[index].fitness
+
+        for i in range(1, k):
+            index2 = random.randint(0, self.size - 1)
+            fitness2 = self.population[index].fitness
+
+            if fitness2 > fitness:
+                fitness = fitness2
+                index = index2
+
+        return self.population[index]
 
     def roulette(self, k):
         pass
@@ -86,11 +99,11 @@ class Population():
             ind.set_fitness()
 
     def print_best(self):
-        best = sorted(self.population)[:1].print()
+        best = sorted(self.population, reverse=True)[:1][0].print()
 
     def kelitism_load(self):
         if self.elitism > 0:
-            self.elite = sorted(self.population)[:self.elitism]
+            self.elite = sorted(self.population, reverse=False)[:self.elitism]
 
     def kelitism_save(self):
         if self.elitism > 0:
